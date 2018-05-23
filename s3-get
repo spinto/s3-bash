@@ -32,6 +32,7 @@ function printHelpAndExit
 	printf " -e\t\toptional\ts3 endpoint (default: s3.amazonaws.com)\n"
 	printf " -k\tstring\tmandatory\tAWS Access Key Id\n"
 	printf " -s\tfile\tmandatory\tAWS Secret Access Key Id File\n"
+	printf " -K\tstring\toptional\tAWS Access Key Id (alternative to AWS Secret Access Key Id File)\n"
 	printf " -S\t\toptional\tUse https\n"
 	printf " -H\tfile\toptional\tFile to write response headers to\n"
 	printf " -a\tfile\toptional\tFile to read Amazon custom headers from (X-Amz-Date is not allowed)\n"
@@ -53,7 +54,7 @@ function parseOptions
 	protocol="http"
 	dumpHeaderFile="/dev/null"
 	amazonHeaderFile="/dev/null"
-	while getopts "hvk:s:SH:a:e:" optionName; do
+	while getopts "hvk:s:K:SH:a:e:" optionName; do
 		case "$optionName" in
 			h)	printHelpAndExit 0;;
 			v)	verbose="-v";;
@@ -63,6 +64,7 @@ function parseOptions
 				if [ ! -e "$awsAccessSecretKeyIdFile" ]; then
 					printErrorHelpAndExit "AWS Secret Key Id file does not exist" $userSpecifiedDataErrorExitCode
 				fi;;
+			K)      createTemporaryFile "kefile"; awsAccessSecretKeyIdFile=$(mostRecentTemporaryFile); echo -n "$OPTARG" >$awsAccessSecretKeyIdFile;;
 			S)	protocol="https";;
 			H)	dumpHeaderFile="$OPTARG";;
 			a)	amazonHeaderFile="$OPTARG"
